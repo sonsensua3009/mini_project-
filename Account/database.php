@@ -5,7 +5,7 @@ class Database
     private $servername = "localhost";
     private $username = "root";
     private $password = "ServBay.dev";
-    private $dbname = "ban_hang";
+    private $dbname = "mini_project";
     public $conn;
     public function __construct()
     {
@@ -19,9 +19,10 @@ class Database
         if ($this->conn->connect_error) {
             die("Kết nối thất bại". $this->conn->connect_error);
 }
- echo "Kết nối thành công"; 
+ 
 }
 }
+
 
 
 ?>
