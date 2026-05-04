@@ -1,40 +1,49 @@
 <?php
 require_once __DIR__ . '/database.php';
 $db = new Database();
-$conn = $db->conn ;
+$conn = $db->conn;
 
 // Thêm sách
 if (isset($_POST['add'])) {
-    $title = $_POST['title'];
+    $title  = $_POST['title'];
     $author = $_POST['author'];
-    $price = $_POST['price'];
-    $conn->query("INSERT INTO books (title, author, price) VALUES ('$title','$author','$price')");
+    $price  = $_POST['price'];
+
+    $stmt = $conn->prepare("INSERT INTO books (title, author, price) VALUES (?, ?, ?)");
+    $stmt->bind_param("ssd", $title, $author, $price);
+    $stmt->execute();
 }
 
 // Sửa sách
 if (isset($_POST['update'])) {
-    $id = $_POST['id'];
-    $title = $_POST['title'];
+    $id     = $_POST['id'];
+    $title  = $_POST['title'];
     $author = $_POST['author'];
-    $price = $_POST['price'];
-    $conn->query("UPDATE books SET title='$title', author='$author', price='$price' WHERE id=$id");
+    $price  = $_POST['price'];
+
+    $stmt = $conn->prepare("UPDATE books SET title=?, author=?, price=? WHERE id=?");
+    $stmt->bind_param("ssdi", $title, $author, $price, $id);
+    $stmt->execute();
 }
 
 // Xóa sách
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
-    $conn->query("DELETE FROM books WHERE id=$id");
+    $stmt = $conn->prepare("DELETE FROM books WHERE id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
 }
 
 // Lấy danh sách sách
 $result = $conn->query("SELECT * FROM books");
 ?>
 
+
 <h2>Thêm sách</h2>
 <form method="post">
     <input type="text" name="title" placeholder="Tên sách" required>
     <input type="text" name="author" placeholder="Tác giả">
-    <input type="number" name="price" placeholder="Năm xuất bản">
+    <input type="number" name="price" placeholder="Giá tiền">
     <button type="submit" name="add">Thêm</button>
 </form>
 
