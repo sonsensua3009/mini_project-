@@ -1,4 +1,5 @@
 <?php
+// Xử lý logic tạo mật khẩu mới
 require_once __DIR__ ."/database.php";
 $db = new Database();
 $conn = $db->conn;
@@ -44,7 +45,7 @@ if ($password !== $confirm) {
 
 }
 
-
+// Tạo form cho mật khẩu mới
 ?>
 
 <!DOCTYPE html>
@@ -53,6 +54,7 @@ if ($password !== $confirm) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+  <link rel="stylesheet" type="text/css" href="reset_password.css">
 </head>
 <body>
 <form method="post" action="reset_password.php">
