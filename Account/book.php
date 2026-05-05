@@ -1,4 +1,11 @@
 <?php
+
+session_start();
+if (!isset($_SESSION['id'])) {
+    header("Location: login.php");
+    exit() ;
+}
+
 require_once __DIR__ . '/database.php';
 $db = new Database();
 $conn = $db->conn;
@@ -38,8 +45,135 @@ if (isset($_GET['delete'])) {
 $result = $conn->query("SELECT * FROM books");
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* Nền và font */
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f9;
+  margin: 0;
+  padding: 20px;
+}
 
-<h2>Thêm sách</h2>
+/* Tiêu đề */
+h2 {
+  color: #333;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+/* Form thêm sách */
+form {
+  margin: 0 auto 20px auto;
+  max-width: 400px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+form input[type="text"],
+form input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+form button {
+  width: 100%;
+  padding: 10px;
+  background: #4CAF50;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+form button:hover {
+  background: #45a049;
+}
+
+/* Bảng danh sách */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  margin-top: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+table th, table td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+table th {
+  background: #4CAF50;
+  color: #fff;
+}
+
+table tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+table input[type="text"],
+table input[type="number"] {
+  width: 90%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Nút sửa và xóa */
+table button {
+  background: #2196F3;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+}
+
+table button:hover {
+  background: #1976D2;
+}
+
+table a {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 6px 10px;
+  background: #f44336;
+  color: #fff;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+table a:hover {
+  background: #d32f2f;
+}
+
+/* Nút đăng xuất */
+form button[name="logout"] {
+  background: #ff9800;
+}
+
+form button[name="logout"]:hover {
+  background: #e68900;
+}
+
+    </style>
+</head>
+<body>
+    <h2>Thêm sách</h2>
 <form method="post">
     <input type="text" name="title" placeholder="Tên sách" required>
     <input type="text" name="author" placeholder="Tác giả">
@@ -69,3 +203,6 @@ $result = $conn->query("SELECT * FROM books");
 <form action="logout.php" method="post">
 <button type="submit" name="logout" >Đăng xuất</button>
 </form>
+
+</body>
+</html>
