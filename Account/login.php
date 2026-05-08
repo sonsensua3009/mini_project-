@@ -1,31 +1,48 @@
 <?php
 
 session_start();
-require_once __DIR__ ."/database.php";
+require_once __DIR__ . "/database.php";
+
 $db = new Database();
 $conn = $db->conn;
-$error ="";
-if ($_SERVER["REQUEST_METHOD"] == "POST"){
-$email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-$password = $_POST['password']?? ""; 
 
+$error = "";
 
-$stmt = $conn->prepare("SELECT * FROM users WHERE email= ? AND password=?");
-$stmt->bind_param("ss", $email,$password);
-$stmt->execute();
-$result = $stmt->get_result();
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+  $password = $_POST['password'] ;
 
-if ($row = $result->fetch_assoc()) {
-    $_SESSION["id"] = $row["id"];
-    header("Location: book.php");
-    exit();
-} else {
-    $error = "Sai email hoặc mật khẩu";
-$stmt->close();
-$conn->close();
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email=?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($user = $result->fetch_assoc()) {
+       
+       if(hash('sha256', $_POST['password'])===$user['password']) {
+       
+      $_SESSION["id"] = $user["id"];
+     
+      $stmt->close();
+      $conn->close();
+
+      header("Location:book.php");
+      exit();
+    } else {
+      $error= "Sai mật khẩu";
+      var_dump($user);
+    } } else
+    {
+      $error=  "Không tìm thấy tài khoản";
+       
+    }
+
+    $stmt->close();
+    $conn->close();
+     
 }
 
-}
+
 
 
 ?>
@@ -40,7 +57,10 @@ $conn->close();
     /* Thiết kế trang web */
     body {
   font-family: Arial, sans-serif;
-  background: #555;
+  background-image: url("west.jpg");
+background-repeat: no-repeat;   /* không lặp lại */
+  background-position: center;    /* căn giữa ảnh */
+  background-size: cover;         /* ảnh phủ kín toàn bộ màn hình */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -115,26 +135,29 @@ button:hover {
   </style>
 </head>
 <body>
-  <body>
+  
   <div class="login-container">
     <h2>Đăng nhập</h2>
     <form method="post" action="login.php" autocomplete="off">
       <label for="email">Email</label>
-      <input type="text" name="email" id="email" autocomplete="off" value=" " /><br />
+      <input type="text" name="email" id="email" autocomplete="off" /><br />
       <label for="password">Mật khẩu</label>
-      <input type="password" name="password" id="password" autocomplete="off" value=" "/><br />
+      <input type="password" name="password" id="password" autocomplete="off"/><br />
+        <?php if (!empty($error)): ?>
+    <p style="color:red;"><?php echo $error; ?></p>
+  <?php endif; ?>
       <button type="submit">Đăng nhập</button>
       
-      <?php if (!empty($error)): ?>
-        <p class="error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></p>
-      <?php endif; ?>
+       
     </form>
+     
+    <form action="forgot_password.php" method="get">
+      <?php $_SESSION['allow_forgot'] = true; ?>
 
-    <form action="forgot_password.php" method="post">
       <button type="submit" class="forgot-btn">Quên mật khẩu</button>
     </form>
   </div>
-</body>
+
 
 </body>
 </html>

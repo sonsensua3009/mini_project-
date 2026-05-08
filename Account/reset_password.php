@@ -1,16 +1,23 @@
 <?php
 // Xử lý logic tạo mật khẩu mới
+
+session_start();
+if (empty($_SESSION["allow_forgot"])) {
+header ("Location: login.php");
+exit();
+}
+unset ($_SESSION["allow_forgot"]);
 require_once __DIR__ ."/database.php";
 $db = new Database();
 $conn = $db->conn;
 
-$token = $_GET["token"]?? " ";
+$token = $_GET["token"]?? "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-$password = $_POST["new_password"]??" ";
-$confirm = $_POST["confirm_password"]??" ";
-$token = $_POST["token"]??" ";
+$password = $_POST["new_password"]??"";
+$confirm = $_POST["confirm_password"]??"";
+$token = $_POST["token"]??"";
 
 if (!$password||!$confirm) {
      die ("Vui lòng nhập vào!");
@@ -55,6 +62,58 @@ if ($password !== $confirm) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
   <link rel="stylesheet" type="text/css" href="reset_password.css">
+  <style>
+    /* reset_password.css */
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f6f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+form {
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  width: 300px;
+}
+
+form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #333;
+}
+
+form input[type="password"] {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+form button {
+  width: 100%;
+  padding: 10px;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+form button:hover {
+  background-color: #45a049;
+}
+
+  </style>
 </head>
 <body>
 <form method="post" action="reset_password.php">
