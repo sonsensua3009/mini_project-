@@ -1,10 +1,5 @@
 <?php
 session_start();
-if (empty($_SESSION['allow_forgot'])) {
-    header("Location: login.php");
-    exit();
-}
- unset($_SESSION['allow_forgot']);
 
 require_once __DIR__ . '/database.php';
 $db = new Database();
@@ -21,31 +16,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     else {
         $email = $_POST['email'];
         $token = bin2hex(random_bytes(16));
+      
+ $stmt = $conn->prepare("SELECT id FROM users WHERE email=?");
+ $stmt->bind_param("s", $email);
+ $stmt->execute();
+ $result = $stmt->get_result();  
 
-        $stmt = $conn->prepare("SELECT id FROM users WHERE email=?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
+if ($result->num_rows === 0) {
+    $error = "Email không tồn tại";
+} else {
+    $stmt->close();
 
-        if ($result->num_rows === 0) {
-            $error = "Email không tồn tại";
-        } else {
-            $stmt = $conn->prepare("UPDATE users SET reset_token=? WHERE email=?");
-            $stmt->bind_param("ss", $token, $email);
-            $stmt->execute();
-            $stmt->close();
-            $conn->close();
+    $stmt = $conn->prepare("UPDATE users SET reset_token=? WHERE email=?");
+    $stmt->bind_param("ss", $token, $email);
+    $stmt->execute();
+    $stmt->close();
+    $conn->close();
 
-         
-
-            header("Location: reset_password.php?token=" . $token);
-            exit();
+    
+    header("Location: reset_password.php?token=" . $token);
+    exit();
+}
         }
     }
-}
-?>
 
-<!-- HTML phần trước -->
+?>
 
 <!DOCTYPE html>
 <html lang="en">

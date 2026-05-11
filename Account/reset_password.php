@@ -2,15 +2,13 @@
 // Xử lý logic tạo mật khẩu mới
 
 session_start();
-if (empty($_SESSION["allow_forgot"])) {
-header ("Location: login.php");
-exit();
-}
-unset ($_SESSION["allow_forgot"]);
+
+
+
 require_once __DIR__ ."/database.php";
 $db = new Database();
 $conn = $db->conn;
-
+$error = "";
 $token = $_GET["token"]?? "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -20,13 +18,13 @@ $confirm = $_POST["confirm_password"]??"";
 $token = $_POST["token"]??"";
 
 if (!$password||!$confirm) {
-     die ("Vui lòng nhập vào!");
+     $error = "Vui lòng nhập mật khẩu";
 }
 
-if ($password !== $confirm) {
-    die ("Mật khẩu không khớp");
+elseif ($password !== $confirm) {
+    $error = "Mật khẩu không khớp";
 }
-
+else{
  
     $stmt = $conn->prepare("SELECT id FROM users WHERE reset_token=?");
     $stmt->bind_param("s", $token);
@@ -36,23 +34,19 @@ if ($password !== $confirm) {
     if ($result->num_rows === 0) {
         die("Token không hợp lệ");
     }
-
     $user = $result->fetch_assoc();
-
-
-    $hashed = password_hash($password, PASSWORD_DEFAULT);
-
-   
-    $stmt = $conn->prepare("UPDATE users SET password=?, reset_token=NULL WHERE id=?");
+    $hashed = hash("sha256", $password);
+    $stmt = $conn->prepare("UPDATE users SET password=?, reset_token = NULL WHERE id=?");
     $stmt->bind_param("si", $hashed, $user['id']);
     $stmt->execute();
 
     echo "Đổi mật khẩu thành công!";
+   
     exit;
-
 }
+}
+ unset($_SESSION["allow_forgot"]);
 
-// Tạo form cho mật khẩu mới
 ?>
 
 <!DOCTYPE html>

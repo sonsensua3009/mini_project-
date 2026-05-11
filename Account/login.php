@@ -7,7 +7,7 @@ $db = new Database();
 $conn = $db->conn;
 
 $error = "";
-
+// Xử lý đăng nhập
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
   $password = $_POST['password'] ;
@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($user = $result->fetch_assoc()) {
        
-       if(hash('sha256', $_POST['password'])===$user['password']) {
+       if(hash("sha256", $password) == $user["password"]) {
        
       $_SESSION["id"] = $user["id"];
      
@@ -30,22 +30,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       exit();
     } else {
       $error= "Sai mật khẩu";
-      var_dump($user);
+     
     } } else
     {
       $error=  "Không tìm thấy tài khoản";
        
     }
 
-    $stmt->close();
-    $conn->close();
+
      
+}
+if (isset($_SESSION["id"])) {
+    header("Location: book.php");
+    exit();
 }
 
 
 
-
 ?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -152,8 +157,6 @@ button:hover {
     </form>
      
     <form action="forgot_password.php" method="get">
-      <?php $_SESSION['allow_forgot'] = true; ?>
-
       <button type="submit" class="forgot-btn">Quên mật khẩu</button>
     </form>
   </div>
